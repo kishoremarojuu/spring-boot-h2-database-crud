@@ -7,16 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.bezkoder.spring.jpa.h2.model.Tutorial;
 import com.bezkoder.spring.jpa.h2.repository.TutorialRepository;
@@ -84,6 +75,31 @@ public class TutorialController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	@PatchMapping("/tutorials/{id}")
+	public Tutorial updateMinimalTutorialById(@RequestBody final Tutorial tutorial, @PathVariable final String id) {
+
+		Optional<Tutorial> tutorialFromDB = tutorialRepository.findById(Long.parseLong(id));
+
+		boolean someValue = false;
+		if (tutorial.getTitle() != null) {
+			tutorialFromDB.ifPresent(tutorial1 -> tutorial1.setTitle(tutorial.getTitle()));
+			someValue= true;
+		}
+		if(tutorial.getDescription()!=null){
+			tutorialFromDB.ifPresent(tutorial1 -> tutorial1.setDescription(tutorial.getDescription()));
+			someValue= true;
+		}
+
+		Tutorial updatedTutorial = null;
+		if(someValue){
+			updatedTutorial = tutorialRepository.save(tutorial);
+		}
+
+		return updatedTutorial;
+
+
 	}
 
 	@DeleteMapping("/tutorials/{id}")
